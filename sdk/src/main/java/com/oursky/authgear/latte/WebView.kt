@@ -25,7 +25,6 @@ internal class WebView(context: Context, val request: WebViewRequest, webContent
         }
 
         webViewClient = WebViewClient(this)
-        // TODO: copy WebChromeClient from OAuthWebViewBaseActivity?
     }
 
     fun load() {

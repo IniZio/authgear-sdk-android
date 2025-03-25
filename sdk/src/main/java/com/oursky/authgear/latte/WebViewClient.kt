@@ -1,5 +1,6 @@
 package com.oursky.authgear.latte
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -24,8 +25,17 @@ internal class WebViewClient(
         return false
     }
 
+    private fun checkExternalURI(view: android.webkit.WebView?, request: WebResourceRequest?, uri: Uri): Boolean {
+        if (request == null || (request.isForMainFrame && request.isRedirect)) {
+            val browserIntent = Intent(Intent.ACTION_VIEW, uri)
+            view?.context?.startActivity(browserIntent)
+            return true
+        }
+        return false
+    }
+
     override fun shouldOverrideUrlLoading(view: android.webkit.WebView?, url: String?): Boolean {
-        return super.shouldOverrideUrlLoading(view, url) || this.checkRedirectURI(Uri.parse(url))
+        return super.shouldOverrideUrlLoading(view, url) || this.checkRedirectURI(Uri.parse(url)) || this.checkExternalURI(view, null, Uri.parse(url))
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -33,7 +43,7 @@ internal class WebViewClient(
         view: android.webkit.WebView,
         request: WebResourceRequest
     ): Boolean {
-        return super.shouldOverrideUrlLoading(view, request) || this.checkRedirectURI(request.url)
+        return super.shouldOverrideUrlLoading(view, request) || this.checkRedirectURI(request.url) || this.checkExternalURI(view, request, request.url)
     }
 
     override fun onPageStarted(view: android.webkit.WebView?, url: String?, favicon: Bitmap?) {
